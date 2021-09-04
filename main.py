@@ -69,7 +69,7 @@ if __name__ == '__main__':
     root = tk.Tk()
     status_text = tk.StringVar()
     status_text.set("집중")
-    status_label = tk.Label(root, textvariable=status_text, fg="black", font=("console", 30))
+    status_label = tk.Label(root, textvariable=status_text, fg="black", font=("맑은고딕", 30))
     status_label.pack(side="bottom")
 
     # thread 시작
