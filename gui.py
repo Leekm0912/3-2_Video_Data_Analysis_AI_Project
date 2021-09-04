@@ -1,11 +1,3 @@
-'''from PIL import Image
-from PIL import ImageTk
-import tkinter as tk
-import threading
-import datetime
-import cv2 as cv
-import os'''
-
 import argparse
 import tkinter as tk  # Tkinter
 import threading  # 스레드 사용
@@ -17,10 +9,16 @@ import numpy as np  # 데이터 처리
 from imutils import face_utils  # 얼굴 분석
 from tensorflow import keras  # 모델 학습 및 테스트
 from playsound import playsound  # 소리 재생
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+from matplotlib import pyplot as plt
+from matplotlib import animation
+
+import random
 
 
 class MainGUI:
     def __init__(self):
+        self.root = tk.Tk()
         parser = argparse.ArgumentParser()
         parser.add_argument('--input', help='Path to image or video. Skip to capture frames from camera')
         parser.add_argument('--thr', default=0.2, type=float, help='Threshold value for pose parts heat map')
@@ -53,6 +51,11 @@ class MainGUI:
 
         self.net = cv.dnn.readNetFromTensorflow("graph_opt.pb")
         self.cap = cv.VideoCapture(self.args.input if self.args.input else 0)
+
+        self.status_text = tk.StringVar()
+        self.status_text.set("집중")
+        self.status_label = tk.Label(self.root, textvariable=self.status_text, fg="black", font=("console", 30))
+        self.status_label.pack(side="bottom")
 
     def camThread(self):
         cap = cv.VideoCapture(0)
@@ -117,6 +120,7 @@ class MainGUI:
         # points에 None을 제외한 값이 2개면 사람 인식 안된거.
         if len(set(points)) <= 2:
             print("사람 없음!")
+            self.status_text.set("사람 없음!")
             return
 
         for pair in self.POSE_PAIRS:
@@ -135,6 +139,10 @@ class MainGUI:
                     if abs(points[idFrom][0] - points[idTo][0]) >= 30 \
                             or points[idFrom][1] - points[idTo][1] <= 60:
                         print("자세불량!")
+                        self.status_text.set("자세불량!")
+                    else:
+                        self.status_text.set("집중")
+
                     # print(idFrom, points[idFrom], idTo, points[idTo])
                 cv.line(frame, points[idFrom], points[idTo], (0, 255, 0), 3)
                 cv.ellipse(frame, points[idFrom], (3, 3), 0, 0, 360, (0, 0, 255), cv.FILLED)
@@ -250,12 +258,32 @@ class MainGUI:
         # OpenCV 동영상
         return imgtk
 
+    def animate(self, i):
+        max_points = 100
+        ax = plt.subplot(211, xlim=(0, 50), ylim=(0, 1024))
+        self.line, = ax.plot(np.arange(max_points),
+                             np.ones(max_points, dtype=np.float) * np.nan, lw=1, c='blue', ms=1)
+        y = random.randint(0, 1024)
+        old_y = self.line.get_ydata()
+        new_y = np.r_[old_y[1:], y]
+        self.line.set_ydata(new_y)
+        print(new_y)
+        return self.line
+
+    def linefunc(self):
+        return self.line
+
 
 if __name__ == '__main__':
     mg = MainGUI()
+
     thread_img = threading.Thread(target=mg.camThread, args=())
     thread_img.daemon = True
     thread_img.start()
 
-    root = tk.Tk()
-    root.mainloop()
+    '''fig = plt.figure()  # figure(도표) 생성
+    canvas = FigureCanvasTkAgg(fig, master=root)  #
+    canvas.get_tk_widget().pack(side="bottom")  #
+    anim = animation.FuncAnimation(fig, mg.animate, init_func=mg.linefunc, frames=200, interval=50, blit=False)'''
+
+    tk.mainloop()
