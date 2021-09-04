@@ -1,3 +1,4 @@
+import configparser  # ini파일 사용
 import tkinter as tk  # Tkinter
 import threading  # 스레드 사용
 
@@ -7,8 +8,7 @@ import EyeStatusDetection  # 눈 깜빡임 체크 모듈
 import PostureDetection  # 자세 체크 모듈
 
 
-def camThread(posture_detection_obj, eye_detection_obj):
-    cap = cv.VideoCapture(0)
+def camThread(cap, posture_detection_obj, eye_detection_obj):
     posture_detection_image_panel = None
     eye_detection_image_panel = None
 
@@ -44,6 +44,20 @@ if __name__ == '__main__':
     posture_detection = PostureDetection.PostureDetection()
     eye_detection = EyeStatusDetection.EyeStatusDetection()
 
+    # 설정파일 불러오기
+    config = configparser.ConfigParser()
+    config.read("config.ini", encoding="utf-8")
+
+    input_source = None
+    # 카메라번호는 숫자. int로 변환이 필요. 변환이 안된다면 동영상 경로인 것.
+    try:
+        input_source = int(config["input"]["input"])
+    except ValueError:
+        input_source = config["input"]["input"]
+
+    # 카메라 동작
+    _cap = cv.VideoCapture(input_source)
+
     # GUI 부분
     root = tk.Tk()
     status_text = tk.StringVar()
@@ -52,7 +66,7 @@ if __name__ == '__main__':
     status_label.pack(side="bottom")
 
     # thread 시작
-    thread_img = threading.Thread(target=camThread, args=(posture_detection, eye_detection))
+    thread_img = threading.Thread(target=camThread, args=(_cap, posture_detection, eye_detection))
     thread_img.daemon = True
     thread_img.start()
 
