@@ -1,12 +1,12 @@
+import tkinter as tk  # GUI 관련
+
 import cv2 as cv  # 이미지 표현
 import dlib  # 눈 좌표 얻어오기
 import numpy as np  # 데이터 처리
 from imutils import face_utils  # 얼굴 분석
 from tensorflow import keras  # 모델 학습 및 테스트
 from playsound import playsound  # 소리 재생
-import threading  # 스레드 사용
-from PIL import ImageTk, Image  # Pillow`
-import tkinter as tk
+from PIL import ImageTk, Image  # Pillow
 
 
 class EyeStatusDetection:
@@ -115,15 +115,3 @@ class EyeStatusDetection:
         imgtk = ImageTk.PhotoImage(image=img)  # ImageTk 객체로 변환
         # frame을 ImageTk 객체로 변환
         return imgtk
-
-
-if __name__ == '__main__':
-    esd = EyeStatusDetection()
-    cap = cv.VideoCapture(0)
-    window = tk.Tk()
-    while cap.isOpened():
-        ret, frame = cap.read()
-        result = esd.detector(frame)
-        label = tk.Label(window, image=result)
-        label.image = result  # need to keep the reference of your image to avoid garbage collection
-        cv.waitKey(1)
