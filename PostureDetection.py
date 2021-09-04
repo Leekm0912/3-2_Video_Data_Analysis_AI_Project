@@ -1,7 +1,7 @@
 import configparser
 
 import cv2 as cv
-from PIL import ImageTk, Image  # Pillow`
+from PIL import ImageTk, Image  # Pillow
 
 
 class PostureDetection:
