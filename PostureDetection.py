@@ -1,18 +1,13 @@
+import configparser
+
 import cv2 as cv
-import numpy as np
-import argparse
 from PIL import ImageTk, Image  # Pillow`
 
 
 class PostureDetection:
     def __init__(self):
-        parser = argparse.ArgumentParser()
-        parser.add_argument('--input', help='Path to image or video. Skip to capture frames from camera')
-        parser.add_argument('--thr', default=0.2, type=float, help='Threshold value for pose parts heat map')
-        parser.add_argument('--width', default=368, type=int, help='Resize input to specific width.')
-        parser.add_argument('--height', default=368, type=int, help='Resize input to specific height.')
-
-        self.args = parser.parse_args()
+        self.config = configparser.ConfigParser()
+        self.config.read("config.ini", encoding="utf-8")
 
         self.BODY_PARTS = {"Nose": 0, "Neck": 1, "RShoulder": 2, "RElbow": 3, "RWrist": 4,
                            "LShoulder": 5, "LElbow": 6, "LWrist": 7, "RHip": 8, "RKnee": 9,
@@ -25,8 +20,8 @@ class PostureDetection:
                            ["LHip", "LKnee"], ["LKnee", "LAnkle"], ["Neck", "Nose"], ["Nose", "REye"],
                            ["REye", "REar"], ["Nose", "LEye"], ["LEye", "LEar"]]
 
-        self.inWidth = self.args.width
-        self.inHeight = self.args.height
+        self.inWidth = int(self.config["posture"]["width"])
+        self.inHeight = int(self.config["posture"]["height"])
 
         self.net = cv.dnn.readNetFromTensorflow("graph_opt.pb")
 
@@ -56,7 +51,7 @@ class PostureDetection:
             x = (frameWidth * point[0]) / out.shape[3]
             y = (frameHeight * point[1]) / out.shape[2]
             # Add a point if it's confidence is higher than threshold.
-            points.append((int(x), int(y)) if conf > self.args.thr else None)
+            points.append((int(x), int(y)) if conf > float(self.config["posture"]["thr"]) else None)
 
         # points에 None을 제외한 값이 2개면 사람 인식 안된거.
         if len(set(points)) <= 2:
