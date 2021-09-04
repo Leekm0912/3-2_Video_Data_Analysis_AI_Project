@@ -66,10 +66,13 @@ class EyeStatusDetection:
 
                 eye_img_l, eye_rect_l = crop_eye(self.gray, eye_points=shapes[36:42])
                 eye_img_r, eye_rect_r = crop_eye(self.gray, eye_points=shapes[42:48])
-
-                eye_img_l = cv.resize(eye_img_l, dsize=IMG_SIZE)
-                eye_img_r = cv.resize(eye_img_r, dsize=IMG_SIZE)
-                eye_img_r = cv.flip(eye_img_r, flipCode=1)
+                try:
+                    eye_img_l = cv.resize(eye_img_l, dsize=IMG_SIZE)
+                    eye_img_r = cv.resize(eye_img_r, dsize=IMG_SIZE)
+                    eye_img_r = cv.flip(eye_img_r, flipCode=1)
+                except:
+                    print("오류 1")
+                    return
 
                 eye_input_l = eye_img_l.copy().reshape((1, IMG_SIZE[1], IMG_SIZE[0], 1)).astype(np.float32) / 255.
                 eye_input_r = eye_img_r.copy().reshape((1, IMG_SIZE[1], IMG_SIZE[0], 1)).astype(np.float32) / 255.

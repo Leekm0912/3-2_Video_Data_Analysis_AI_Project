@@ -9,7 +9,7 @@ import PostureDetection  # 자세 체크 모듈
 import StatusCheck
 
 
-def camThread(cap, posture_detection_obj, eye_detection_obj, status_check_obj, status_text_obj):
+def work_thread(cap, posture_detection_obj, eye_detection_obj, status_check_obj, status_text_obj, status_label_obj):
     posture_detection_image_panel = None
     eye_detection_image_panel = None
 
@@ -36,7 +36,12 @@ def camThread(cap, posture_detection_obj, eye_detection_obj, status_check_obj, s
         else:
             eye_detection_image_panel.configure(image=eye_detection_image)
             eye_detection_image_panel.image = eye_detection_image
-        status_text_obj.set(status_check_obj.check())
+        text = status_check_obj.check()
+        if text != "집중":
+            status_label_obj["fg"] = "red"
+        else:
+            status_label_obj["fg"] = "black"
+        status_text_obj.set(text)
         cv.waitKey(1)
 
 
@@ -68,7 +73,7 @@ if __name__ == '__main__':
     status_label.pack(side="bottom")
 
     # thread 시작
-    thread_img = threading.Thread(target=camThread, args=(_cap, posture_detection, eye_detection, status_check, status_text))
+    thread_img = threading.Thread(target=work_thread, args=(_cap, posture_detection, eye_detection, status_check, status_text, status_label))
     thread_img.daemon = True
     thread_img.start()
 
