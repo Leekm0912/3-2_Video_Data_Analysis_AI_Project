@@ -6,17 +6,18 @@ import cv2 as cv  # OpenCV
 
 import EyeStatusDetection  # 눈 깜빡임 체크 모듈 
 import PostureDetection  # 자세 체크 모듈
+import StatusCheck
 
 
-def camThread(cap, posture_detection_obj, eye_detection_obj):
+def camThread(cap, posture_detection_obj, eye_detection_obj, status_check_obj, status_text_obj):
     posture_detection_image_panel = None
     eye_detection_image_panel = None
 
     while cap.isOpened():
         ret, frame = cap.read()
         # 각각 모듈에 frame을 주고 결과를 얻어옴.
-        posture_detection_image = posture_detection_obj.detection(frame)
-        eye_detection_image = eye_detection_obj.detection(frame)
+        posture_detection_image = posture_detection_obj.detection(frame, status_check_obj)
+        eye_detection_image = eye_detection_obj.detection(frame, status_check_obj)
 
         # 패널이 None이면 pack 시켜줌
         if posture_detection_image_panel is None:
@@ -35,7 +36,7 @@ def camThread(cap, posture_detection_obj, eye_detection_obj):
         else:
             eye_detection_image_panel.configure(image=eye_detection_image)
             eye_detection_image_panel.image = eye_detection_image
-
+        status_text_obj.set(status_check_obj.check())
         cv.waitKey(1)
 
 
@@ -43,6 +44,7 @@ if __name__ == '__main__':
     # 모듈 객체 만들기
     posture_detection = PostureDetection.PostureDetection()
     eye_detection = EyeStatusDetection.EyeStatusDetection()
+    status_check = StatusCheck.StatusCheck()
 
     # 설정파일 불러오기
     config = configparser.ConfigParser()
@@ -66,7 +68,7 @@ if __name__ == '__main__':
     status_label.pack(side="bottom")
 
     # thread 시작
-    thread_img = threading.Thread(target=camThread, args=(_cap, posture_detection, eye_detection))
+    thread_img = threading.Thread(target=camThread, args=(_cap, posture_detection, eye_detection, status_check, status_text))
     thread_img.daemon = True
     thread_img.start()
 

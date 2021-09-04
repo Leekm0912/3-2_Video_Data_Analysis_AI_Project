@@ -1,7 +1,10 @@
+# 자세 감지 모듈
 import configparser
 
 import cv2 as cv
 from PIL import ImageTk, Image  # Pillow
+
+import StatusCheck
 
 
 class PostureDetection:
@@ -25,8 +28,9 @@ class PostureDetection:
 
         self.net = cv.dnn.readNetFromTensorflow("graph_opt.pb")
 
-    def detection(self, frame):
+    def detection(self, frame, status_check_obj: StatusCheck.StatusCheck):
         print("v1")
+        nose_detected = False
         cp_frame = frame.copy()
         frameWidth = cp_frame.shape[1]
         frameHeight = cp_frame.shape[0]
@@ -55,9 +59,10 @@ class PostureDetection:
 
         # points에 None을 제외한 값이 2개면 사람 인식 안된거.
         if len(set(points)) <= 2:
-            print("사람 없음!")
-            # status_text.set("사람 없음!")
-            return
+            print("몸 인식 X")
+            status_check_obj.no_body = True
+        else:
+            status_check_obj.no_body = False
 
         for pair in self.POSE_PAIRS:
             partFrom = pair[0]
@@ -72,11 +77,15 @@ class PostureDetection:
                 # 코 -> 목
                 if idFrom == 1 and idTo == 0:
                     # 고개를 돌렸거나, 고개를 숙였을 때.
-                    if abs(points[idFrom][0] - points[idTo][0]) >= 30 \
-                            or points[idFrom][1] - points[idTo][1] <= 60:
-                        print("자세불량!")
+                    if abs(points[idFrom][0] - points[idTo][0]) >= 30:
+                        print("자세불량!(좌우)")
+                        status_check_obj.turn_head_LR = True
+                    elif abs(points[idFrom][1] - points[idTo][1]) <= 60:
+                        print("자세불량!(상하)")
+                        status_check_obj.turn_head_UD = True
                     else:
-                        pass
+                        status_check_obj.turn_head_LR = False
+                        status_check_obj.turn_head_UD = False
 
                     # print(idFrom, points[idFrom], idTo, points[idTo])
                 cv.line(cp_frame, points[idFrom], points[idTo], (0, 255, 0), 3)
