@@ -21,6 +21,8 @@ class EyeStatusDetection:
         # 학습한 모델을 불러옴
         self.model = keras.models.load_model('models/2018_12_17_22_58_35.h5')
         self.model.summary()
+        # 눈을 감은 프레임을 세줄 변수
+        self.n_count = 0
 
     # frame을 받아 눈의 위치와 상태를 찍어서 ImageTk 객체로 변환 후 리턴
     def detection(self, frame, status_check_obj: StatusCheck.StatusCheck):
@@ -28,8 +30,8 @@ class EyeStatusDetection:
         cp_frame = frame.copy()
         # 추출할 눈 이미지 사이즈
         IMG_SIZE = (34, 26)
-        # 눈을 감은 프레임을 세줄 변수
-        n_count = 0
+
+
         # 경보음 다중재생 방지 변수
         global is_playing
         is_playing = False
@@ -79,15 +81,16 @@ class EyeStatusDetection:
 
                 pred_l = self.model.predict(eye_input_l)
                 pred_r = self.model.predict(eye_input_r)
-
+                print(self.n_count)
                 if pred_l < 0.1 and pred_r < 0.1:
-                    n_count += 1
+                    self.n_count += 1
                 else:
-                    n_count = 0
+                    self.n_count = 0
                     is_playing = False
                     # playsound("")
 
-                if n_count > 100:
+                # 졸았다고 판단하면.
+                if self.n_count > 10:
                     cv.putText(cp_frame, "Wake up", (120, 160), cv.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
                     status_check_obj.close_eyes = True
                     # 스레드에서 사운드 재생
