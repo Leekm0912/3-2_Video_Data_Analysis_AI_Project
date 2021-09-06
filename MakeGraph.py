@@ -4,6 +4,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 from matplotlib import animation
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+import PlaySound
 
 import StatusCheck
 
@@ -30,15 +31,17 @@ class MakeGraph:
     # private
     def __animate(self, i):
         old_y = self.line.get_ydata()
-        y = old_y[-1] + StatusCheck.StatusCheck.check_weight[self.sc.check()]
-        if y > 99:
-            y = 99
-        elif y < 1:
-            y = 1
+        self.score = old_y[-1] + StatusCheck.StatusCheck.check_weight[self.sc.check()]
+        if self.score > 99:
+            self.score = 99
+        elif self.score < 1:
+            self.score = 1
 
-        new_y = np.r_[old_y[1:], y]
+        new_y = np.r_[old_y[1:], self.score]
         self.line.set_ydata(new_y)
         print(new_y)
+        if self.score <= 50:
+            PlaySound.PlaySound.play("sound/sound1.wav")
         sleep(0.5)
         return self.line
 

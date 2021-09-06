@@ -6,7 +6,7 @@ import dlib  # 눈 좌표 얻어오기
 import numpy as np  # 데이터 처리
 from imutils import face_utils  # 얼굴 분석
 from tensorflow import keras  # 모델 학습 및 테스트
-from playsound import playsound  # 소리 재생
+from PlaySound import PlaySound  # 소리 재생
 from PIL import ImageTk, Image  # Pillow
 
 import StatusCheck
