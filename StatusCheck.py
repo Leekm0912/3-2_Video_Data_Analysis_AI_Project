@@ -1,4 +1,17 @@
 class StatusCheck:
+    check_str = {
+        0: "집중",
+        1: "사람 인식 X",
+        2: "주의력 산만",
+        3: "졸음"
+    }
+    check_weight = {
+        0: 2,
+        1: -2,
+        2: -2,
+        3: -2
+    }
+
     # 하나의 싱글톤 인스턴스를 생성
     # 이미 생성된 인스턴스가 있다면 재사용
     def __new__(cls, *args, **kwargs):
@@ -30,15 +43,19 @@ class StatusCheck:
     def check(self):
         # 눈과 몸이 안보이면
         if self.no_eyes and self.no_body:
-            return "사람 인식 X"
+            # "사람 인식 X"
+            return 1
         # 고개를 움직이면
         elif self.turn_head_UD or self.turn_head_LR:
-            return "주의력 산만"
+            # "주의력 산만"
+            return 2
         # 눈을 감으면
         elif self.close_eyes:
-            return "졸음"
+            # "졸음"
+            return 3
         else:
-            return "집중"
+            # "집중"
+            return 0
 
 
 if __name__ == '__main__':

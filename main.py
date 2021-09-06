@@ -37,7 +37,8 @@ def work_thread(cap, posture_detection_obj, eye_detection_obj, status_check_obj,
         else:
             eye_detection_image_panel.configure(image=eye_detection_image)
             eye_detection_image_panel.image = eye_detection_image
-        text = status_check_obj.check()
+        text = StatusCheck.StatusCheck.check_str[status_check_obj.check()]
+
         if text != "집중":
             status_label_obj["fg"] = "red"
         else:
@@ -74,7 +75,10 @@ if __name__ == '__main__':
     status_label.pack(side="bottom")
 
     # 그래프
-    mg = MakeGraph.MakeGraph(root)
+    mg = MakeGraph.MakeGraph(root, status_check)
+    graph = threading.Thread(target=mg.start_graph, args=())
+    graph.daemon = True
+    graph.start()
 
     # thread 시작
     thread_img = threading.Thread(target=work_thread, args=(_cap, posture_detection, eye_detection, status_check, status_text, status_label))
