@@ -6,8 +6,7 @@ import cv2 as cv  # OpenCV
 
 import EyeStatusDetection  # 눈 깜빡임 체크 모듈 
 import PostureDetection  # 자세 체크 모듈
-import StatusCheck  # 상태 체크 모듈
-import MakeGraph  # 그래프 모듈
+import StatusCheck
 
 
 def work_thread(cap, posture_detection_obj, eye_detection_obj, status_check_obj, status_text_obj, status_label_obj):
@@ -72,9 +71,6 @@ if __name__ == '__main__':
     status_text.set("집중")
     status_label = tk.Label(root, textvariable=status_text, fg="black", font=("맑은고딕", 30))
     status_label.pack(side="bottom")
-
-    # 그래프
-    mg = MakeGraph.MakeGraph(root)
 
     # thread 시작
     thread_img = threading.Thread(target=work_thread, args=(_cap, posture_detection, eye_detection, status_check, status_text, status_label))
