@@ -16,7 +16,7 @@ class MakeGraph:
         max_points = 50
         self.ax = plt.subplot(211, xlim=(0, max_points), ylim=(0, 100))
         self.line, = self.ax.plot(np.arange(max_points),
-                                  np.ones(max_points, dtype=np.float) * np.nan, lw=1, c='blue', ms=1)
+                                  np.ones(max_points, dtype=np.float) * np.nan, lw=1, c='blue', ms=100)
         old_y = self.line.get_ydata()
         new_y = np.r_[old_y[1:], 80]
         self.line.set_ydata(new_y)
@@ -46,6 +46,6 @@ class MakeGraph:
         return self.line
 
     def start_graph(self):
-        anim = animation.FuncAnimation(self.fig, self.__animate, init_func=self.__get_line, frames=100, interval=100,
+        anim = animation.FuncAnimation(self.fig, self.__animate, init_func=self.__get_line, frames=60, interval=1000,
                                        blit=False)
         sleep(0.1)
