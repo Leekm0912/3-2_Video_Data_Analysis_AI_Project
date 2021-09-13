@@ -17,26 +17,34 @@ def work_thread(cap, posture_detection_obj, eye_detection_obj, status_check_obj,
     while cap.isOpened():
         ret, frame = cap.read()
         # 각각 모듈에 frame을 주고 결과를 얻어옴.
-        posture_detection_image = posture_detection_obj.detection(frame, status_check_obj)
-        eye_detection_image = eye_detection_obj.detection(frame, status_check_obj)
+        posture_detection_image_thread = threading.Thread(target=posture_detection_obj.detection, args=(frame, status_check_obj))
+        posture_detection_image_thread.daemon = True
+        posture_detection_image_thread.start()
+        # posture_detection_image = posture_detection_obj.detection(frame, status_check_obj)
+        eye_detection_image_thread = threading.Thread(target=eye_detection_obj.detection, args=(frame, status_check_obj))
+        eye_detection_image_thread.daemon = True
+        eye_detection_image_thread.start()
+        # eye_detection_image = eye_detection_obj.detection(frame, status_check_obj)
 
         # 패널이 None이면 pack 시켜줌
-        if posture_detection_image_panel is None:
-            posture_detection_image_panel = tk.Label(image=posture_detection_image)
-            posture_detection_image_panel.image = posture_detection_image
-            posture_detection_image_panel.pack(side="left")
-        # 패널이 존재하면 업데이트 시켜줌
-        else:
-            posture_detection_image_panel.configure(image=posture_detection_image)
-            posture_detection_image_panel.image = posture_detection_image
+        if posture_detection_obj.result_frame:
+            if posture_detection_image_panel is None:
+                posture_detection_image_panel = tk.Label(image=posture_detection_obj.result_frame)
+                posture_detection_image_panel.image = posture_detection_obj.result_frame
+                posture_detection_image_panel.pack(side="left")
+            # 패널이 존재하면 업데이트 시켜줌
+            else:
+                posture_detection_image_panel.configure(image=posture_detection_obj.result_frame)
+                posture_detection_image_panel.image = posture_detection_obj.result_frame
         # 동일
-        if eye_detection_image_panel is None:
-            eye_detection_image_panel = tk.Label(image=eye_detection_image)
-            eye_detection_image_panel.image = eye_detection_image
-            eye_detection_image_panel.pack(side="left")
-        else:
-            eye_detection_image_panel.configure(image=eye_detection_image)
-            eye_detection_image_panel.image = eye_detection_image
+        if eye_detection_obj.result_frame:
+            if eye_detection_image_panel is None:
+                eye_detection_image_panel = tk.Label(image=eye_detection_obj.result_frame)
+                eye_detection_image_panel.image = eye_detection_obj.result_frame
+                eye_detection_image_panel.pack(side="left")
+            else:
+                eye_detection_image_panel.configure(image=eye_detection_obj.result_frame)
+                eye_detection_image_panel.image = eye_detection_obj.result_frame
         text = StatusCheck.StatusCheck.check_str[status_check_obj.check()]
 
         if text != "집중":
