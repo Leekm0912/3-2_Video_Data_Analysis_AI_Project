@@ -1,7 +1,7 @@
 # 3-2_Video_Data_Analysis_AI_Project
 3-2학기 영상 데이터 분석 AI 프로젝트
 
-![OpenAI 판넬](https://user-images.githubusercontent.com/42348176/149049322-e2ac0c9a-cbda-48c0-bdcb-ace4c5169e8f.jpg)
+![OpenAI 판넬](https://user-images.githubusercontent.com/42348176/149257192-0a271696-2a85-49c8-9039-bfbec40636e0.jpg)
 
 ## 목표
 - 표정분석 (집중 여부, 졸음 여부 체크)
