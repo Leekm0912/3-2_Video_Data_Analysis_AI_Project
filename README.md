@@ -1,6 +1,9 @@
 # 3-2_Video_Data_Analysis_AI_Project
 3-2학기 영상 데이터 분석 AI 프로젝트
 
+![OpenAI 상장](https://user-images.githubusercontent.com/42348176/150910812-2967edaa-664b-47ec-a87c-5b4fb24180a2.png)
+
+
 ![OpenAI 판넬](https://user-images.githubusercontent.com/42348176/149257192-0a271696-2a85-49c8-9039-bfbec40636e0.jpg)
 
 ## 목표
